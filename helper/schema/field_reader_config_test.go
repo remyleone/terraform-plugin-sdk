@@ -138,6 +138,22 @@ func TestConfigFieldReader_DefaultHandling(t *testing.T) {
 				return "FuncDefault", nil
 			},
 		},
+		"container": {
+			Type: TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Computed:    true,
+			Elem: &Resource{
+				Schema: map[string]*Schema{
+					"booleanWithTrueDefault": {
+						Type:        TypeBool,
+						Optional:    true,
+						Default:     true,
+					},
+				},
+			},
+
+		},
 	}
 
 	cases := map[string]struct {
@@ -189,6 +205,16 @@ func TestConfigFieldReader_DefaultHandling(t *testing.T) {
 				"strWithDefaultFunc": "fromConfig",
 			}),
 			false,
+		},
+		"boolean value with true default in a container": {
+			Addr: []string{"container.0.booleanWithTrueDefault"},
+			Result: FieldReadResult{
+				Value: true,
+				Exists: true,
+				Computed: false,
+			},
+			Config: testConfig(t, map[string]interface{}{}),
+			Err: false,
 		},
 	}
 
